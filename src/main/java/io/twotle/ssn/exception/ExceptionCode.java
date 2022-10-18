@@ -1,13 +1,13 @@
-package io.twotle.ssn.component;
+package io.twotle.ssn.exception;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ExceptionCode {
     ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, 1, "Already Registered"),
-    DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 0, "Something Error");
+    DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 0, "Something Error"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND,2,"User not found");
 
     private final HttpStatus status;
     private final int code;

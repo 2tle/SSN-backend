@@ -2,32 +2,24 @@ package io.twotle.ssn.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.twotle.ssn.dto.RegisterDTO;
-import io.twotle.ssn.dto.ResultResponseDTO;
-import io.twotle.ssn.repository.UserRepository;
-import io.twotle.ssn.service.AuthService;
+import io.twotle.ssn.service.api.AuthService;
+import io.twotle.ssn.service.jwt.JwtUtil;
+import io.twotle.ssn.service.redis.RedisUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -43,6 +35,8 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+    private JwtUtil jwtUtil;
+    private RedisUtil redisUtil;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,7 +44,7 @@ class AuthControllerTest {
     @BeforeEach
     public void setup() {
         mvc =
-                MockMvcBuilders.standaloneSetup(new AuthController(authService))
+                MockMvcBuilders.standaloneSetup(new AuthController(authService, jwtUtil, redisUtil))
                         .addFilters(new CharacterEncodingFilter("UTF-8", true)) // utf-8 필터 추가
                         .build();
     }
@@ -66,8 +60,7 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
         );
         act.andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("result").value(true));
+                .andExpect(status().isCreated());
     }
 
     @Test

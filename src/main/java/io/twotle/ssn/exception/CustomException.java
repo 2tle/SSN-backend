@@ -1,4 +1,4 @@
-package io.twotle.ssn.component;
+package io.twotle.ssn.exception;
 
 public class CustomException extends RuntimeException {
     private final ExceptionCode exceptionCode;

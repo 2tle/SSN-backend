@@ -1,19 +1,15 @@
-package io.twotle.ssn.service;
+package io.twotle.ssn.service.api;
 
-import io.twotle.ssn.component.CustomException;
-import io.twotle.ssn.component.ExceptionCode;
-import io.twotle.ssn.dto.EmailDTO;
+import io.twotle.ssn.exception.CustomException;
+import io.twotle.ssn.exception.ExceptionCode;
+import io.twotle.ssn.dto.LoginDTO;
 import io.twotle.ssn.dto.RegisterDTO;
 import io.twotle.ssn.entity.User;
 import io.twotle.ssn.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,6 +27,14 @@ public class AuthService {
         return this.userRepository.save(newUser);
     }
 
+    public User signIn(LoginDTO loginDTO) throws CustomException {
+        Optional<User> user = this.userRepository.findByEmail(loginDTO.getEmail());
+        if(user.isEmpty()) throw new CustomException(ExceptionCode.USER_NOT_FOUND);
+        if(!user.get().checkPassword(loginDTO.getPassword(), bCryptPasswordEncoder))
+            throw new CustomException(ExceptionCode.USER_NOT_FOUND);
+        return user.get();
+    }
+
     public boolean isEmailAvailable(String email) {
         Optional<User> byEmail = this.userRepository.findByEmail(email);
         return !byEmail.isEmpty();
@@ -40,6 +44,10 @@ public class AuthService {
         Optional<User> byUsername = this.userRepository.findByUsername(username);
         return !byUsername.isEmpty();
     }
+
+
+    //delete User
+    // delete user accoun
 
 
 
